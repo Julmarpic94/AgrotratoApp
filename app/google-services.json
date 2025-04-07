@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "970591845339",
+    "project_id": "agrotrato-8562a",
+    "storage_bucket": "agrotrato-8562a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970591845339:android:e7cd2f46842ca4400185fe",
+        "android_client_info": {
+          "package_name": "com.agrotrato1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_IAuqlWktyKezxzygyNOhvPqPktt0Ku0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970591845339:android:e45d874a6a4e56e10185fe",
+        "android_client_info": {
+          "package_name": "com.example.agrotratosimple"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_IAuqlWktyKezxzygyNOhvPqPktt0Ku0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
