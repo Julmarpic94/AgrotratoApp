@@ -1,5 +1,6 @@
 package com.example.agrotratosimple
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,16 +12,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.agrotratosimple.ui.theme.AgroTratoSimpleTheme
 import androidx.compose.material3.Surface
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.google.firebase.FirebaseApp
 
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             AgroTratoSimpleTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    AppNavigator() // Aquí va la navegación central
+                    AppNavigator()
                 }
             }
         }
@@ -32,11 +37,16 @@ class MainActivity : ComponentActivity() {
 fun AppNavigator() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Pantalla.Home.ruta) {
+    NavHost(navController = navController, startDestination = Pantalla.Login.ruta) {
+        //NAVEGADOR LOGIN
         composable(Pantalla.Login.ruta) {
             Login(
-                onLoginSuccess = {
-                    navController.navigate(Pantalla.Home.ruta) {
+                onLoginSuccess = { nombre, tipo ->
+                    //Codificamos el nombre para evitar problemas con acentos
+                    val nombreEncode = Uri.encode(nombre)
+                    val tipoEncode = Uri.encode(tipo)
+
+                    navController.navigate("home/$nombreEncode/$tipoEncode") {
                         popUpTo(Pantalla.Login.ruta) { inclusive = true }
                     }
                 },
@@ -45,7 +55,7 @@ fun AppNavigator() {
                 }
             )
         }
-
+        //NAVEGADOR REGISTRO
         composable(Pantalla.Registro.ruta) {
             Registro(
                 onRegistroSuccess = {
@@ -56,12 +66,26 @@ fun AppNavigator() {
                 }
             )
         }
+        //NAVEGADOR HOME
+        composable(
+            //Pasamos el nombre y lo
+            route = "home/{nombre}/{tipo}",
+            arguments = listOf(
+                navArgument("nombre"){type = NavType.StringType},
+                navArgument("tipo"){type = NavType.StringType},
+                )
+        ) { backStackEntry ->
+            //Decodificamos los nombres para pasarlos al home
+            val nombre = Uri.decode(backStackEntry.arguments?.getString("nombre"))
+            val tipo = Uri.decode(backStackEntry.arguments?.getString("tipo"))
 
-        composable(Pantalla.Home.ruta) {
             HomePantalla(
+                nombre = nombre,
+                tipo = tipo,
                 onLogout = {
                     navController.navigate(Pantalla.Login.ruta) {
-                        popUpTo(Pantalla.Home.ruta) { inclusive = true }
+                        //Rompe los datos de navegación y sale
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )

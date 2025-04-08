@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,21 +30,20 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agrotratosimple.ui.theme.Amarillo
 import com.example.agrotratosimple.ui.theme.VerdeClaro
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.material3.TextFieldDefaults
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
 fun Login(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String, String) -> Unit,
     onGoToRegistro: () -> Unit,
 ) {
-    var usuario by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
 
@@ -76,9 +76,9 @@ fun Login(
         )
 
         OutlinedTextField(
-            value = usuario,
-            onValueChange = { usuario = it },
-            label = { Text("Usuario") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedTextColor = Color.Black,
@@ -122,9 +122,9 @@ fun Login(
         Button(
             onClick = {
                 autentificar(
-                    usuario,
+                    email,
                     contrasena,
-                    onSuccess = { onLoginSuccess() },
+                    onSuccess = { nombre, tipo -> onLoginSuccess(nombre, tipo) },
                     onError = { error -> mensajeError = error }
                 )
             },
@@ -144,7 +144,7 @@ fun Login(
 
         //BOTON PARA REGISTRARSE
         Button(
-            onClick = {onGoToRegistro()},
+            onClick = { onGoToRegistro() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = VerdeClaro,
                 contentColor = Color.White
@@ -172,29 +172,33 @@ fun Login(
 fun autentificar(
     usuario: String,
     contrasena: String,
-    onSuccess: () -> Unit,
+    onSuccess: (String, String) -> Unit,
     onError: (String) -> Unit
 ) {
     if (usuario.isNotEmpty() && contrasena.isNotEmpty()) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(usuario, contrasena)
-            .addOnSuccessListener {
-                onSuccess()
+            .addOnSuccessListener { authResult ->
+                val uid = authResult.user?.uid ?: return@addOnSuccessListener
+                // Consultamos Firestore para obtener los datos del usuario
+                FirebaseFirestore.getInstance()
+                    .collection("usuarios")
+                    .document(uid)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val nombre = document.getString("nombre") ?: "Usuario"
+                        val tipo = document.getString("clase") ?: "COMPRADOR"
+
+                        onSuccess(nombre, tipo)
+                    }
+                    .addOnFailureListener {
+                        onError("Error al recuperar datos del usuario.")
+                    }
             }
-            .addOnFailureListener { e ->
-                onError(e.message ?: "Error al iniciar sesion")
+            .addOnFailureListener {
+                onError(it.message ?: "Error al iniciar sesión.")
             }
-    } else {
-        onError("Campos Vacíos")
     }
 }
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginVista() {
-    Login(
-        onLoginSuccess = {},
-        onGoToRegistro = {}
-    )
-}
