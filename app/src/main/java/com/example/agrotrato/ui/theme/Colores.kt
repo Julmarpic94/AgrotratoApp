@@ -1,4 +1,4 @@
-package com.example.agrotratosimple.ui.theme
+package com.example.agrotrato.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

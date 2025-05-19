@@ -1,4 +1,4 @@
-package com.example.agrotratosimple
+package com.example.agrotrato
 
 import org.junit.Test
 

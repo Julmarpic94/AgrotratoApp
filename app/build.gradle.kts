@@ -2,11 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
 }
 
 android {
-    namespace = "com.example.agrotratosimple"
+    namespace = "com.example.agrotrato"
     compileSdk = 35
 
     defaultConfig {
@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    //Notificaciones
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
 
     implementation(libs.androidx.navigation.compose)
