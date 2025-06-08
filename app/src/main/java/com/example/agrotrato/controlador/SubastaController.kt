@@ -36,4 +36,31 @@ class SubastaController(
         servicio.eliminarSubasta(subastaId, onSuccess, onError)
     }
 
+    fun desactivarSubastasFin(
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+    ){
+        servicio.desactivarSubastasFin(onSuccess, onError)
+    }
+
+    fun marcarSubastaNotificada(
+        subastaId: String,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        servicio.marcarSubastaNotificada(subastaId, onSuccess, onError)
+    }
+
+
+    fun eliminarSubastasNotificadas(
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        servicio.eliminarSubastasNotificadas(onSuccess, onError)
+    }
+
+
+
+
+
 }

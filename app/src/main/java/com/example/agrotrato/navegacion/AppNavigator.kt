@@ -16,6 +16,8 @@ import com.example.agrotrato.vista.MisSubastasVista
 import com.example.agrotrato.vista.MisPujasVista
 import com.example.agrotrato.vista.PerfilVista
 import com.example.agrotrato.vista.HacerPujaVista
+import com.example.agrotrato.vista.NotificacionesVista
+import com.example.agrotrato.vista.NotificacionesLeidas
 
 @Composable
 fun AppNavigator() {
@@ -86,20 +88,25 @@ fun AppNavigator() {
         }
         //ACCESO A VER SUBASTAS
         composable(
-            route = "verSubastas/{idUsuario}",
-            arguments = listOf(navArgument("idUsuario") { type = NavType.StringType })
+            route = "verSubastas/{idUsuario}/{tipoUsuario}",
+            arguments = listOf(
+                navArgument("idUsuario") { type = NavType.StringType },
+                navArgument("tipoUsuario") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val idUsuario = backStackEntry.arguments?.getString("idUsuario") ?: ""
+            val tipoUsuario = Uri.decode(backStackEntry.arguments?.getString("tipoUsuario") ?: "")
 
             VerSubastasVista(
                 navController = navController,
                 idUsuario = idUsuario,
+                tipoUsuario = tipoUsuario,
                 onVolverHome = {
                     navController.popBackStack()
                 }
             )
-
         }
+
 
         //VER MIS SUBASTAS
         composable(
@@ -146,6 +153,47 @@ fun AppNavigator() {
             )
         }
 
+        //VER NOTIFICACIONES
+        composable(
+            route = "misNotificaciones/{nombre}/{tipo}/{uid}",
+            arguments = listOf(
+                navArgument("nombre") { type = NavType.StringType },
+                navArgument("tipo") { type = NavType.StringType },
+                navArgument("uid") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val nombre = Uri.decode(backStackEntry.arguments?.getString("nombre") ?: "")
+            val tipo = Uri.decode(backStackEntry.arguments?.getString("tipo") ?: "")
+            val uid = backStackEntry.arguments?.getString("uid") ?: ""
+
+            NotificacionesVista(
+                idUsuario = uid,
+                onVolverHome = {
+                    navController.navigate(Pantalla.Home.crearRuta(nombre, tipo, uid)) {
+                        popUpTo(Pantalla.Home.ruta) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        //VER HISTORIAL DE NOTIFICACIONES
+        composable(
+            route = "notificacionesLeidas/{idUsuario}",
+            arguments = listOf(navArgument("idUsuario") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val idUsuario = backStackEntry.arguments?.getString("idUsuario") ?: ""
+
+            NotificacionesLeidas(
+                idUsuario = idUsuario,
+                onVolverHome = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        //HACER PUJA
         composable(
             route = "hacerPuja/{subastaId}/{idUsuario}",
             arguments = listOf(

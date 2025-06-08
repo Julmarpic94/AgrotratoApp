@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class PujaService {
     private val db = FirebaseFirestore.getInstance()
 
+    // CREAR PUJA ACTULIZANDO PRECIO
     fun hacerPuja(
         subastaId: String,
         puja: Puja,
@@ -38,6 +39,7 @@ class PujaService {
             }
     }
 
+    // OBTENER LAS PUJAS CON EL TITULO DE LA SUBASTA
     fun obtenerTodasLasPujasConTitulos(
         onSuccess: (List<Triple<String, String, Puja>>) -> Unit,
         onError: (String) -> Unit
@@ -84,8 +86,7 @@ class PujaService {
             }
     }
 
-
-
+    // BORRAR PUJA COMPROBANDO PUJAS ANTERIORES
     fun eliminarPuja(
         subastaId: String,
         pujaId: String,
@@ -132,7 +133,7 @@ class PujaService {
             }
     }
 
-
+    // OBTENER EL PRECIO ACTUAL DE UNA SUBASTA
     fun obtenerPrecioActual(
         subastaId: String,
         onSuccess: (Double) -> Unit,

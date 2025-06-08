@@ -90,13 +90,15 @@ fun MisSubastasVista(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
+
                         Button(
                             onClick = {
                                 controller.eliminarSubasta(
                                     subasta.id,
                                     onSuccess = {
                                         // Actualizar la lista local tras eliminar
-                                        listaSubastas = listaSubastas.filter { it.id != subasta.id }
+                                        listaSubastas =
+                                            listaSubastas.filter { it.id != subasta.id }
                                     },
                                     onError = { mensaje = it }
                                 )

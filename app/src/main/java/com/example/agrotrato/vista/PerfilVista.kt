@@ -49,6 +49,7 @@ fun PerfilVista(
     var apellidos by remember { mutableStateOf("") }
     var nif by remember { mutableStateOf("") }
     var clase by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
 
     Column(
@@ -127,6 +128,22 @@ fun PerfilVista(
                 .padding(bottom = 14.dp)
         )
 
+        OutlinedTextField(
+            value = telefono,
+            onValueChange = { nuevoValor ->
+                if (nuevoValor.all { it.isDigit() }) {
+                    telefono = nuevoValor
+                }
+            },
+            label = { Text("Teléfono") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = customTextFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 14.dp)
+        )
+
         ComboBox(
             selectedOption = clase,
             onOptionSelected = { clase = it }
@@ -137,7 +154,7 @@ fun PerfilVista(
         // Botón Actualizar
         Button(
             onClick = {
-                val datosActualizados = UsuarioRegistro(email, contrasena, nombre, apellidos, nif, clase)
+                val datosActualizados = UsuarioRegistro(email, contrasena, nombre, apellidos, nif, clase, telefono)
 
                 controller.actualizarUsuario(
                     idUsuario = idUsuario,

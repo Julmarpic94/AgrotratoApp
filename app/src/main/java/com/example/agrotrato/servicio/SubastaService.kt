@@ -1,6 +1,7 @@
 package com.example.agrotrato.servicio
 
 import com.example.agrotrato.modelo.Subasta
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -48,30 +49,24 @@ class SubastaService {
                 onError(error.message ?: "Error al obtener subastas")
             }
     }
+
     //OBTENER TODAS LA SUBASTA ACTIVAS
     fun obtenerSubastasActivas(
         onSuccess: (List<Subasta>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val hoy = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
-        coleccion.get()
+        coleccion
+            .whereEqualTo("activo", true)
+            .get()
             .addOnSuccessListener { result ->
-                val listaSubastas = result.documents.mapNotNull { doc ->
-                    val subasta = doc.toObject(Subasta::class.java)
-                    // Comprobamos si la subasta ya venció
-                    if (subasta != null && subasta.fechaFin == hoy && subasta.activo) {
-                        // Desactivamos
-                        coleccion.document(subasta.id).update("activo", false)
-                    }
-                    subasta
-                }.filter { it.activo } // solo mostramos activas
+                val listaSubastas = result.documents.mapNotNull { it.toObject(Subasta::class.java) }
                 onSuccess(listaSubastas)
             }
             .addOnFailureListener { error ->
                 onError(error.message ?: "Error al obtener subastas")
             }
     }
+
     //Eliminar suabasata
     fun eliminarSubasta(
         subastaId: String,
@@ -84,70 +79,74 @@ class SubastaService {
             .addOnFailureListener { e -> onError("Error al eliminar subasta: ${e.message}") }
     }
 
-    fun revisarSubastasFinalizadas(
-        vendedorId: String,
-        onNotificaciones: (List<Pair<Subasta, Puja?>>) -> Unit,
+
+    //DESACTIVAR SUSBASTAS ACABADAS
+    fun desactivarSubastasFin(
+        onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+        val hoy = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
         val db = FirebaseFirestore.getInstance()
-        val ahora = System.currentTimeMillis()
-        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         db.collection("subastas")
-            .whereEqualTo("vendedorId", vendedorId)
             .whereEqualTo("activo", true)
             .get()
-            .addOnSuccessListener { subastasSnapshot ->
-                val notificaciones = mutableListOf<Pair<Subasta, Puja?>>()
-
-                val tareasPendientes = subastasSnapshot.documents.size
-                var procesadas = 0
-
-                for (doc in subastasSnapshot) {
-                    val subasta = doc.toObject(Subasta::class.java)?.copy(id = doc.id) ?: continue
-                    val fechaFin = formato.parse(subasta.fechaFin)?.time ?: continue
-
-                    if (ahora > fechaFin) {
-                        // Subasta finalizada
-                        doc.reference.update("activo", false)
-
-                        // Buscar la puja más alta
-                        doc.reference.collection("pujas")
-                            .get()
-                            .addOnSuccessListener { pujasSnapshot ->
-                                val pujaGanadora = pujasSnapshot
-                                    .mapNotNull { it.toObject(Puja::class.java) }
-                                    .maxByOrNull { it.monto }
-
-                                notificaciones.add(Pair(subasta, pujaGanadora))
-                                procesadas++
-                                if (procesadas == tareasPendientes) {
-                                    onNotificaciones(notificaciones)
-                                }
-                            }
-                            .addOnFailureListener {
-                                notificaciones.add(Pair(subasta, null))
-                                procesadas++
-                                if (procesadas == tareasPendientes) {
-                                    onNotificaciones(notificaciones)
-                                }
-                            }
-                    } else {
-                        procesadas++
-                        if (procesadas == tareasPendientes) {
-                            onNotificaciones(notificaciones)
-                        }
-                    }
+            .addOnSuccessListener { subastas ->
+                val tareas = subastas.documents.mapNotNull { doc ->
+                    val subasta = doc.toObject(Subasta::class.java)
+                    if (subasta != null && subasta.fechaFin == hoy) {
+                        db.collection("subastas").document(subasta.id).update("activo", false)
+                    } else null
                 }
 
-                if (tareasPendientes == 0) onNotificaciones(emptyList())
+                // Esperar a que todas las actualizaciones terminen
+                Tasks.whenAllComplete(tareas)
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { e -> onError("Error al desactivar subastas: ${e.message}") }
             }
-            .addOnFailureListener {
-                onError("Error al revisar subastas: ${it.message}")
+            .addOnFailureListener { e ->
+                onError("Error al obtener subastas: ${e.message}")
             }
+    }
+
+    fun marcarSubastaNotificada(
+        subastaId: String,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        db.collection("subastas")
+            .document(subastaId)
+            .update("notificada", true)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onError(e.message ?: "Error al marcar subasta como notificada") }
+    }
+
+    fun eliminarSubastasNotificadas(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        db.collection("subastas")
+            .whereEqualTo("activo", false)
+            .whereEqualTo("notificada", true)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { doc ->
+                    batch.delete(doc.reference)
+                }
+                batch.commit()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { e -> onError(e.message ?: "Error al eliminar subastas notificadas") }
+            }
+            .addOnFailureListener { e -> onError(e.message ?: "Error al obtener subastas notificadas") }
     }
 
 
 
-
 }
+
+
+
+
+
+

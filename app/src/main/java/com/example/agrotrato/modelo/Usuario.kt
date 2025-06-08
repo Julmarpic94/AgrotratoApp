@@ -6,7 +6,8 @@ data class Usuario (
     val nombre: String,
     val apellidos: String,
     val nif: String,
-    val clase: String
+    val clase: String,
+    val telefono: String
 )
 
 

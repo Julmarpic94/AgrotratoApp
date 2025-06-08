@@ -18,7 +18,8 @@ class RegistroController(
             registro.nombre.isNotBlank() &&
             registro.apellidos.isNotBlank() &&
             registro.nif.isNotBlank() &&
-            registro.clase.isNotBlank()
+            registro.clase.isNotBlank()&&
+            registro.telefono.isNotBlank()
         ) {
             registroService.registrarUsuario(registro, onSuccess, onError)
         } else {

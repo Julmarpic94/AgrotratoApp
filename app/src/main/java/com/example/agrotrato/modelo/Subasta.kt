@@ -5,12 +5,13 @@ data class Subasta(
     val titulo: String = "",
     val descripcion: String = "",
     val cantidadKg: Int = 0,
-    val precioActual: Double = 0.0, // Para mantener el precio actual de la subasta
+    val precioActual: Double = 0.0,
     val precioInicial: Double = 0.0,
     val fechaInicio: String = "",
     val fechaFin: String = "",
     val tipoProducto: String = "",
     val vendedorId: String = "",
-    val activo: Boolean = true // activa por defecto
+    val activo: Boolean = true, // activa por defecto
+    val notificada: Boolean = false // false por defecto
 )
 

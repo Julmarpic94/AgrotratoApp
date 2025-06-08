@@ -10,9 +10,12 @@ sealed class Pantalla(val ruta: String) {
         fun crearRuta(idUsuario: String): String = "crearSubasta/$idUsuario"
     }
 
-    object VerSubastas : Pantalla("verSubastas/{idUsuario}"){
-        fun crearRuta(idUsuario: String): String = "verSubastas/$idUsuario"
+    object VerSubastas : Pantalla("verSubastas/{idUsuario}/{tipoUsuario}") {
+        fun crearRuta(idUsuario: String, tipoUsuario: String): String {
+            return "verSubastas/$idUsuario/${Uri.encode(tipoUsuario)}"
+        }
     }
+
 
     object MisSubastas : Pantalla("misSubastas/{idUsuario}"){
         fun crearRuta(idUsuario: String): String = "misSubastas/$idUsuario"
@@ -24,6 +27,16 @@ sealed class Pantalla(val ruta: String) {
 
     object MisPerfil : Pantalla("miPerfil/{idUsuario}"){
         fun crearRuta(idUsuario: String): String = "miPerfil/$idUsuario"
+    }
+
+    object MisNotificaciones : Pantalla("misNotificaciones/{nombre}/{tipo}/{uid}") {
+        fun crearRuta(nombre: String, tipo: String, uid: String): String {
+            return "misNotificaciones/${Uri.encode(nombre)}/${Uri.encode(tipo)}/$uid"
+        }
+    }
+
+    object NotificacionesLeidas : Pantalla("notificacionesLeidas/{idUsuario}") {
+        fun crearRuta(idUsuario: String): String = "notificacionesLeidas/$idUsuario"
     }
 
 

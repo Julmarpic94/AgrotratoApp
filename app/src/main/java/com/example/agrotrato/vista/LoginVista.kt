@@ -51,10 +51,10 @@ fun LoginVista(
         )
 
         Text(
-            text = "Subasta tu Cosecha",
+            text = "\"Tú decides cuánto vale tu cosecha\"",
             style = TextStyle(
                 color = VerdeClaro,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Italic
             ),

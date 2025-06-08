@@ -25,7 +25,8 @@ class RegistroService {
                     nombre = registro.nombre,
                     apellidos = registro.apellidos,
                     nif = registro.nif,
-                    clase = registro.clase
+                    clase = registro.clase,
+                    telefono = registro.telefono
                 )
 
                 db.collection("usuarios")

@@ -26,6 +26,7 @@ import com.example.agrotrato.navegacion.Pantalla
 fun VerSubastasVista(
     navController: NavController,
     idUsuario: String,
+    tipoUsuario: String,
     onVolverHome: () -> Unit,
     controller: SubastaController = SubastaController()
 ) {
@@ -182,18 +183,20 @@ fun VerSubastasVista(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Button(
-                                onClick = {
-                                    navController.navigate(
-                                        Pantalla.HacerPuja.crearRuta(subasta.id, idUsuario)
+                            if  (tipoUsuario == "COMPRADOR") {
+                                Button(
+                                    onClick = {
+                                        navController.navigate(
+                                            Pantalla.HacerPuja.crearRuta(subasta.id, idUsuario)
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Amarillo,
+                                        contentColor = Color.White
                                     )
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amarillo,
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Text("Hacer Puja")
+                                ) {
+                                    Text("Hacer Puja")
+                                }
                             }
                         }
                     }

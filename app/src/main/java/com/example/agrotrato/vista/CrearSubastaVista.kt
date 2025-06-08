@@ -197,7 +197,8 @@ fun CrearSubastaVista(
                     fechaFin = fechaFin,
                     tipoProducto = tipoProducto,
                     vendedorId = idUsuario,
-                    activo = true
+                    activo = true,
+                    notificada = false
                 )
 
                 controller.crearSubasta(

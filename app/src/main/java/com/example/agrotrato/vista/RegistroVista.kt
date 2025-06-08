@@ -34,6 +34,7 @@ fun RegistroVista(
     var apellidos by remember { mutableStateOf("") }
     var nif by remember { mutableStateOf("") }
     var clase by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("")}
     var mensajeError by remember { mutableStateOf("") }
 
     Column(
@@ -102,6 +103,22 @@ fun RegistroVista(
             modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp)
         )
 
+        OutlinedTextField(
+            value = telefono,
+            onValueChange = { nuevoValor ->
+                if (nuevoValor.all { it.isDigit() }) {
+                    telefono = nuevoValor
+                }
+            },
+            label = { Text("Teléfono") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = customTextFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 14.dp)
+        )
+
         ComboBox(
             selectedOption = clase,
             onOptionSelected = { clase = it }
@@ -112,7 +129,7 @@ fun RegistroVista(
         // Botón Registrar
         Button(
             onClick = {
-                val nuevoRegistro = UsuarioRegistro(email, contrasena, nombre, apellidos, nif, clase)
+                val nuevoRegistro = UsuarioRegistro(email, contrasena, nombre, apellidos, nif, clase, telefono)
                 controller.registrar(
                     nuevoRegistro,
                     onSuccess = {
